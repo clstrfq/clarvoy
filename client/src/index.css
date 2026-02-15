@@ -67,6 +67,20 @@
 }
 
 /* Custom Scrollbar for dark theme */
+.coach-response b {
+  font-weight: 600;
+  color: hsl(var(--foreground));
+}
+.coach-response i {
+  font-style: italic;
+  color: hsl(var(--muted-foreground));
+}
+.coach-response br + br {
+  display: block;
+  content: "";
+  margin-top: 0.5rem;
+}
+
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;

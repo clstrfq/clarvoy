@@ -12,6 +12,7 @@ import Dashboard from "@/pages/Dashboard";
 import CreateDecision from "@/pages/CreateDecision";
 import DecisionDetail from "@/pages/DecisionDetail";
 import AdminDashboard from "@/pages/AdminDashboard";
+import UseCases from "@/pages/UseCases";
 
 function ProtectedRoute({ component: Component }: { component: React.ComponentType }) {
   const { user, isLoading } = useAuth();
@@ -42,6 +43,10 @@ function Router() {
 
       <Route path="/admin">
         <ProtectedRoute component={AdminDashboard} />
+      </Route>
+
+      <Route path="/use-cases">
+        <ProtectedRoute component={UseCases} />
       </Route>
 
       <Route component={NotFound} />

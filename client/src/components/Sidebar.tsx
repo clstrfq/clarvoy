@@ -8,7 +8,8 @@ import {
   BarChart3, 
   LogOut, 
   ShieldCheck, 
-  User 
+  User,
+  BookOpen
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
@@ -49,6 +50,16 @@ export function Sidebar() {
           >
             <PlusCircle className="w-4 h-4" />
             New Decision
+          </Button>
+        </Link>
+        <Link href="/use-cases" className="block">
+          <Button 
+            variant={isActive("/use-cases") ? "secondary" : "ghost"} 
+            className="w-full justify-start gap-3 text-sm font-medium h-10"
+            data-testid="link-use-cases"
+          >
+            <BookOpen className="w-4 h-4" />
+            PA Use Cases
           </Button>
         </Link>
         <Link href="/admin" className="block">

@@ -194,7 +194,40 @@ export async function registerRoutes(
       }
     }
 
-    const systemPrompt = `You are Clarvoy's AI Decision Coach. You help leaders make better decisions by identifying cognitive biases, reducing noise in group judgments, and applying structured decision-making frameworks. You reference concepts like pre-mortem analysis, reference class forecasting, base rates, and adversarial debate. Be concise, practical, and direct. ${context}`;
+    const paContext = `Pennsylvania-specific context for disability services decisions:
+- PA HCBS Waiver structure: Consolidated Waiver, Community Living Waiver, Person/Family Directed Support (P/FDS), Adult Autism Waiver
+- DSP workforce crisis: Current state wage floor is $17.85/hr, national turnover averaging 45-51% for wages below $17/hr
+- Aging-out cliff: IDEA entitlements end at age 21, creating critical transition planning needs
+- Supported Decision-Making vs. guardianship: PA is actively developing SDM frameworks, 47 states now have SDM legislation
+- Federal Medicaid restructuring risks: Block grant/per-capita cap proposals could impact 73%+ of provider revenue
+- Cost differential: Institutional care ~$600K/person/year vs. community-based services ~$120K/person/year
+- HCBS Final Rule: CMS requiring person-centered planning, community integration, competitive integrated employment emphasis`;
+
+    const formatRules = [
+      "Do NOT use markdown syntax. No #, ##, **, *, -, triple backticks, or any markdown formatting whatsoever.",
+      "Use HTML bold tags (the b element) for emphasis and key terms.",
+      "Use HTML italic tags (the i element) for softer emphasis, reflection prompts, or technical terms being introduced.",
+      "Use HTML line break tags (br) for paragraph spacing between sections.",
+      "Use numbered lists as plain text: write '1.' then the item on its own line, '2.' then the next item, and so on.",
+      "Use the arrow character \\u2192 to introduce sub-points or follow-up thoughts.",
+      "Keep paragraphs short (2-3 sentences max) for readability.",
+    ].join("\n");
+
+    const systemPrompt = `You are Clarvoy's AI Decision Coach — a warm, encouraging expert who helps leaders at Pennsylvania non-profit organizations serving adults with intellectual disabilities and autism make better governance decisions.
+
+Your coaching style:
+- Be reassuring and supportive. Acknowledge the difficulty and importance of the decisions these leaders face.
+- Use a growth mindset: frame biases and blind spots as natural and correctable, not failures.
+- After identifying a bias or risk, always follow up with 1-2 open-ended coaching questions that help the user explore the issue further and move toward action.
+- End responses with an encouraging, forward-looking statement that empowers the user to take the next step.
+- Reference concepts like pre-mortem analysis, reference class forecasting, base rates, and adversarial debate — but explain them in plain, accessible language.
+
+Formatting rules (CRITICAL — follow these exactly):
+${formatRules}
+
+${paContext}
+
+${context}`;
 
     res.setHeader("Content-Type", "text/event-stream");
     res.setHeader("Cache-Control", "no-cache");
@@ -336,6 +369,33 @@ export async function registerRoutes(
     if (!req.isAuthenticated()) return res.status(401).json({ message: "Unauthorized" });
     const logs = await storage.getAuditLogs();
     res.json(logs);
+  });
+
+  // === Reference Classes ===
+  app.get("/api/reference-classes", async (req, res) => {
+    const classes = await storage.getReferenceClasses();
+    res.json(classes);
+  });
+
+  app.get("/api/reference-classes/:id", async (req, res) => {
+    const id = parseInt(req.params.id);
+    if (isNaN(id)) return res.status(400).json({ message: "Invalid ID" });
+    const rc = await storage.getReferenceClass(id);
+    if (!rc) return res.status(404).json({ message: "Reference class not found" });
+    res.json(rc);
+  });
+
+  // === Demo Seed ===
+  app.post("/api/admin/seed-demo-data", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).json({ message: "Unauthorized" });
+    try {
+      const { seedDemoData } = await import("./seed/demoData");
+      await seedDemoData(storage);
+      res.json({ message: "Demo data seeded successfully" });
+    } catch (error) {
+      console.error("Seed error:", error);
+      res.status(500).json({ message: "Failed to seed demo data" });
+    }
   });
 
   return httpServer;

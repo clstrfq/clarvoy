@@ -17,6 +17,21 @@ interface ChatMessage {
   content: string;
 }
 
+function sanitizeCoachHTML(raw: string): string {
+  return raw
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/&lt;b&gt;/g, "<b>")
+    .replace(/&lt;\/b&gt;/g, "</b>")
+    .replace(/&lt;i&gt;/g, "<i>")
+    .replace(/&lt;\/i&gt;/g, "</i>")
+    .replace(/&lt;br&gt;/g, "<br>")
+    .replace(/&lt;br\/&gt;/g, "<br>")
+    .replace(/&lt;br \/&gt;/g, "<br>")
+    .replace(/\n/g, "<br>");
+}
+
 interface Provider {
   id: string;
   name: string;
@@ -215,13 +230,19 @@ export function AICoach({ decisionId }: { decisionId: number }) {
                     className={`rounded-lg px-3.5 py-2.5 text-sm leading-relaxed max-w-[80%] ${
                       msg.role === "user"
                         ? "bg-primary text-primary-foreground"
-                        : "bg-muted text-foreground"
+                        : "bg-muted text-foreground coach-response"
                     }`}
                     data-testid={`chat-message-${msg.role}-${i}`}
                   >
-                    {msg.content}
-                    {msg.role === "assistant" && !msg.content && isStreaming && (
-                      <Loader2 className="w-3.5 h-3.5 animate-spin text-muted-foreground" />
+                    {msg.role === "assistant" ? (
+                      <>
+                        <span dangerouslySetInnerHTML={{ __html: sanitizeCoachHTML(msg.content) }} />
+                        {!msg.content && isStreaming && (
+                          <Loader2 className="w-3.5 h-3.5 animate-spin text-muted-foreground" />
+                        )}
+                      </>
+                    ) : (
+                      msg.content
                     )}
                   </div>
                   {msg.role === "user" && (

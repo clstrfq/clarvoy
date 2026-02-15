@@ -104,10 +104,12 @@ export default function CreateDecision() {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
+                        <SelectItem value="GRANT_ALLOCATION">Grant Allocation</SelectItem>
+                        <SelectItem value="BUDGET_APPROVAL">Budget Approval</SelectItem>
+                        <SelectItem value="STRATEGIC_PLANNING">Strategic Planning</SelectItem>
                         <SelectItem value="Strategy">Strategy</SelectItem>
                         <SelectItem value="Finance">Finance</SelectItem>
                         <SelectItem value="Hiring">Hiring</SelectItem>
-                        <SelectItem value="Product">Product</SelectItem>
                         <SelectItem value="Operations">Operations</SelectItem>
                       </SelectContent>
                     </Select>
